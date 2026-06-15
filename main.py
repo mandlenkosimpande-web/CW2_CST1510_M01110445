@@ -1,7 +1,11 @@
 import bcrypt
+import time 
 import csv
 import os 
-CSV_FILE = 'users.csv'
+import sqlite3
+import pandas as pd
+
+CSV_FILE = 'DATA/users.csv'
 
 #Create CSV file if it doesn't exist
 if not os.path.exists(CSV_FILE):
@@ -70,7 +74,7 @@ def login_user():
     max_attempts = 3
 
     for attempts in range(1, max_attempts + 1):
-        password = input("Enter password (attempt {attempt}/ {max_attempts}): ")
+        password = input(f"Enter password attempt {attempts}/ {max_attempts}: ")
         if is_valid_hash(password, stored_hash):
             print(f"Login successful. Welcome, {username}!")
             return
@@ -82,6 +86,26 @@ def login_user():
                 print("Maximum login attempts reached. Please try again later.")
                 return
             
+#create a time stamp for the login attempts
+timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+print(f"Login attempt timestamp: {timestamp}")
 
+while True:
+    print("\n WELCOM TO THE SYSTEM!!!")
+    print("1. Register")
+    print("2. Login")
+    print("3. Exit")
+    choice = input("Enter your choice: ")
+    if choice == '1':
+        register_user()
+    elif choice == '2':
+        login_user()
+    elif choice == '3':
+        print("Exiting the system. Goodbye!")
+        break
+    else:
+        print("Invalid choice. Please try again.")
+
+#database intergration- 
                 
 
