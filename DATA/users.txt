@@ -1,0 +1,2 @@
+username,password
+mandla,$2b$12$hdXYLHve6UDNt/5bngRq4.wljYDBF7KmAwNLu4NbNZVQtFq8SBQbe

@@ -2,14 +2,13 @@ import bcrypt
 import time 
 import csv
 import os 
-import sqlite3
-import pandas as pd
+import sqlite3, pandas as pd
 
-CSV_FILE = 'DATA/users.csv'
+TXT_FILE = 'DATA/users.txt'
 
-#Create CSV file if it doesn't exist
-if not os.path.exists(CSV_FILE):
-    with open(CSV_FILE, 'w', newline='') as f:
+#Create TXT file if it doesn't exist
+if not os.path.exists(TXT_FILE):
+    with open(TXT_FILE, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['username', 'password'])
 
@@ -29,10 +28,15 @@ def is_valid_hash(psw, hash):
 
 #user registration
 def register_user():
-    username = input("Enter username: ")
+    username = input("Enter username: ").strip() #this first line will remove any leading or trailing whitespace from the username input
+
+    #checking if the username is empty afer the initial strip
+    if not username:
+        print("Username cannot contain spaces. Please enter a valid username.")
+        return
 
 #check if the username already exists 
-    with open(CSV_FILE, 'r') as f:
+    with open(TXT_FILE, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row ['username'] == username:
@@ -42,7 +46,7 @@ def register_user():
     password = input ("Enter password: ")
     hashed = generates_hash(password)
 
-    with open(CSV_FILE, 'a', newline='') as f:
+    with open(TXT_FILE, 'a', newline='') as f:
         writer = csv.writer(f)
         writer.writerow([username, hashed])
 
@@ -51,14 +55,14 @@ def register_user():
 
 #user login 
 def login_user():
-    username = input("Enter username: ")
+    username = input("Enter username: ").strip()
    
    #check if the username exists
     user_found = False
     stored_hash = None
 
 
-    with open (CSV_FILE, 'r') as f:
+    with open (TXT_FILE, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row['username'] == username:
@@ -106,6 +110,10 @@ while True:
     else:
         print("Invalid choice. Please try again.")
 
-#database intergration- 
-                
-
+# create database 
+conn = sqlite3.connect('DATA/project_data.db')
+cur = conn.cursor()
+sql = ''
+cur.execute()
+conn.commit()
+conn.close()
