@@ -29,7 +29,11 @@ def is_valid_hash(psw, hash):
 #user registration
 def register_user():
     username = input("Enter username: ").strip() #this first line will remove any leading or trailing whitespace from the username input
+    role = input("Enter role (admin/user): ").strip().lower()
 
+    if role not in ['admin', 'user']:
+        print("Invalid role. Please enter 'admin' or 'user'.")
+        return
     #checking if the username is empty afer the initial strip
     if not username:
         print("Username cannot contain spaces. Please enter a valid username.")
@@ -110,10 +114,30 @@ while True:
     else:
         print("Invalid choice. Please try again.")
 
-# create database 
-conn = sqlite3.connect('DATA/project_data.db')
-cur = conn.cursor()
-sql = ''
-cur.execute()
-conn.commit()
-conn.close()
+# create database  
+def create_users_table(conn):
+    cur = conn.cursor()
+    sql =  '''CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            role TEXT DEFAULT 'user'
+        );'''    
+    cur.execute(sql)
+    conn.commit()
+
+
+def add_user(conn, username, password_hash, role='user'):
+    cur = conn.cursor()
+    sql = '''INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)'''
+    cur.execute(sql, (username, password_hash, role))
+    conn.commit()   
+
+#create db insert, delete, and update functions
+
+with open(TXT_FILE, 'r') as f:
+    user = csv.DictReader(f)
+
+for user in user:
+    name, hash, role = user.strip().split(',')
+    print(_name, hash, role)

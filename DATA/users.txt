@@ -1,2 +1,3 @@
 username,password
 mandla,$2b$12$hdXYLHve6UDNt/5bngRq4.wljYDBF7KmAwNLu4NbNZVQtFq8SBQbe
+jone,$2b$12$zBQafPSa9KwFZG/Ens7Qeu8eP1E8wfMPs8Y8ZCRdXzkyRUFoja3cG
