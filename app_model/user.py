@@ -1,11 +1,3 @@
-import bcrypt
-import time 
-import csv
-import os 
-import sqlite3, pandas as pd
-
-TXT_FILE = 'DATA/users.txt'
-
 #Create TXT file if it doesn't exist
 if not os.path.exists(TXT_FILE):
     with open(TXT_FILE, 'w', newline='') as f:
@@ -87,11 +79,13 @@ def login_user():
 
         if is_valid_hash(password, stored_hash):
             print(f"Login successful. Welcome, {username}!")
-            #create a time stamp for the login attempts
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             print(f"Login attempt timestamp: {timestamp}")
             return
+        #create a time stamp for the login attempts
         
+    
+    
 
         else:
             remaining_attempts = max_attempts - attempts
@@ -100,61 +94,3 @@ def login_user():
             else:
                 print("Maximum login attempts reached. Please try again later.")
                 return
-            
-
-
-# create database  
-def create_users_table(conn):
-    cur = conn.cursor()
-    sql =  '''CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password_hash TEXT NOT NULL,
-            role TEXT DEFAULT 'user'
-        );'''    
-    cur.execute(sql)
-    conn.commit()
-
-
-def add_user(conn, username, password_hash, role='user'):
-    cur = conn.cursor()
-    sql = '''INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)'''
-    cur.execute(sql, (username, password_hash, role))
-    conn.commit()   
-
-def migrate_users_to_db():
-    """Migrate users from TXT/CSV file into SQLite database."""
-    conn = sqlite3.connect('DATA/project_data.db')
-    create_users_table(conn)
-
-
-    with open(TXT_FILE, 'r') as f:
-        reader = csv.DictReader(f, fieldnames=['username', 'password_hash', 'role'])
-        for row in reader:
-            #if the role column is missing, it will default to 'user'
-                add_user(conn, row['username'], row['password_hash'], row.get('role', 'user'))
-    conn.close()
-    print("User data migrated to database successfully.")
-
-    
-
-def main():
-
-    while True:
-        print("\n WELCOM TO THE SYSTEM!!!")
-        print("1. Register")
-        print("2. Login")
-        print("3. Exit")
-        choice = input("Enter your choice: ")
-        if choice == '1':
-            register_user()
-        elif choice == '2':
-            login_user()
-        elif choice == '3':
-            print("Exiting the system. Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please try again.")
-
-if __name__ == '__main__':
-    main()

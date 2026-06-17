@@ -1,3 +1,4 @@
-username,password
-mandla,$2b$12$hdXYLHve6UDNt/5bngRq4.wljYDBF7KmAwNLu4NbNZVQtFq8SBQbe
-jone,$2b$12$zBQafPSa9KwFZG/Ens7Qeu8eP1E8wfMPs8Y8ZCRdXzkyRUFoja3cG
+username,password,role
+mandla,$2b$12$2ma.cdT6EyII3mliMqgXquX3NpirzpGRWDiUTjnLBTCLCZWMjMmAW,admin
+nicole,$2b$12$I0hFhPctiRKv/MLEWUaPE.op2t.rNGYynHRwVO1QZpaFpFWtJz9lK,user
+oleg,$2b$12$kMT8Ci.RSwo98PGU5sXot.daWbpPuzVQYm0kNQL/O1gkBJ0YXZ.oS,user
