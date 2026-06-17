@@ -136,8 +136,10 @@ def add_user(conn, username, password_hash, role='user'):
 #create db insert, delete, and update functions
 
 with open(TXT_FILE, 'r') as f:
-    user = csv.DictReader(f)
+    user = f.readlines(f)
 
 for user in user:
     name, hash, role = user.strip().split(',')
-    print(_name, hash, role)
+    add_user(conn, name, hash, role)
+
+conn.close()
