@@ -2,3 +2,5 @@ username,password,role
 mandla,$2b$12$2ma.cdT6EyII3mliMqgXquX3NpirzpGRWDiUTjnLBTCLCZWMjMmAW,admin
 nicole,$2b$12$I0hFhPctiRKv/MLEWUaPE.op2t.rNGYynHRwVO1QZpaFpFWtJz9lK,user
 oleg,$2b$12$kMT8Ci.RSwo98PGU5sXot.daWbpPuzVQYm0kNQL/O1gkBJ0YXZ.oS,user
+james,$2b$12$TzeHkJfwaTuE/KA.PyXiQeWp8zG3rYcGnWwHZ1LodDjAFu6wRS9Yq,admin
+nate,$2b$12$p1RGKoY1XC281JEQK7prOe9JYLv30tyiGZDOsNKw5RdyTZ51tfVeG,user

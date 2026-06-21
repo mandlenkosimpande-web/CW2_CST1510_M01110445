@@ -103,7 +103,7 @@ def login_user():
             
 
 
-# create database  
+# create database insert, delete, update  
 def create_users_table(conn):
     cur = conn.cursor()
     sql =  '''CREATE TABLE IF NOT EXISTS users (
@@ -116,45 +116,57 @@ def create_users_table(conn):
     conn.commit()
 
 
-def add_user(conn, username, password_hash, role='user'):
+def add_user(conn, username, password_hash, role = 'user'):
     cur = conn.cursor()
     sql = '''INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)'''
-    cur.execute(sql, (username, password_hash, role))
+    param = (username, password_hash, role)
+    cur.execute(sql, param)
     conn.commit()   
 
-def migrate_users_to_db():
-    """Migrate users from TXT/CSV file into SQLite database."""
-    conn = sqlite3.connect('DATA/project_data.db')
-    create_users_table(conn)
-
-
+def migrate_users_to_db(conn):
     with open(TXT_FILE, 'r') as f:
-        reader = csv.DictReader(f, fieldnames=['username', 'password_hash', 'role'])
-        for row in reader:
-            #if the role column is missing, it will default to 'user'
-                add_user(conn, row['username'], row['password_hash'], row.get('role', 'user'))
+        users = f.readlines()
+#the following lines of code allow me to skip the header row so it is not passed as an actuall user
+    for user in users[1:]:  
+        parts = user.strip().split(',')
+        if len(parts) < 3:
+            continue  # skipping blank or malformed lines 
+        username, password_hash, role = parts[0], parts[1], parts[2]
+        add_user(conn, username, password_hash, role)
+
+
+def get_all_users(conn):
+    cur = conn.cursor()
+    create_users_table(conn)
+    migrate_users_to_db(conn)
+    cur = conn.cursor()
+    sql = '''SELECT * FROM users'''
+    cur.execute(sql)
+    users = cur.fetchall()
     conn.close()
-    print("User data migrated to database successfully.")
+    return(users)            
 
-    
 
-def main():
+#read data from users 
+os.makedirs("DATA", exist_ok=True)
+conn = sqlite3.connect("DATA/project_data.db")
+users = get_all_users(conn) 
+print(users)
 
-    while True:
-        print("\n WELCOM TO THE SYSTEM!!!")
-        print("1. Register")
-        print("2. Login")
-        print("3. Exit")
-        choice = input("Enter your choice: ")
-        if choice == '1':
-            register_user()
-        elif choice == '2':
-            login_user()
-        elif choice == '3':
-            print("Exiting the system. Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please try again.")
+while True:
+    print("\n WELCOME TO THE SYSTEM!!!")
+    print("1. Register")
+    print("2. Login")
+    print("3. Exit")
+    choice = input("Enter your choice: ")
+    if choice == '1':
+        register_user()
+    elif choice == '2':
+        login_user()
+    elif choice == '3':
+        print("Exiting the system. Goodbye!")
+        break
+    else:
+        print("Invalid choice. Please try again.")
+        
 
-if __name__ == '__main__':
-    main()
