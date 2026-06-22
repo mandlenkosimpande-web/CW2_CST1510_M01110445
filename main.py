@@ -144,14 +144,38 @@ def get_all_users(conn):
     cur.execute(sql)
     users = cur.fetchall()
     conn.close()
-    return(users)            
+    return(users)   
 
+#read just one user based of name 
 
-#read data from users 
-os.makedirs("DATA", exist_ok=True)
+def get_user(conn, name ):
+    cur = conn.cursor()
+    sql = '''SELECT * FROM users WHERE username = ?'''
+    param = (name,)
+    cur.execute(sql, param)
+    user = cur.fetchone()
+    conn.close()
+    return(user)
+
+def update_user(conn, old_name, new_name):
+    cur = conn.cursor()
+    sql = 'UPDATE users SET username = ? WHERE username = ?'
+    param = (new_name,old_name)
+    cur.execute(sql, param)
+    conn.commit()
+    conn.close
+
 conn = sqlite3.connect("DATA/project_data.db")
-users = get_all_users(conn) 
-print(users)
+cur = conn.cursor()
+sql = 'DELETE FROM users WHERE username = ?'
+param = ('mandlampande',)
+cur.execute(sql, param)
+conn.commit()
+conn.close
+
+
+
+
 
 while True:
     print("\n WELCOME TO THE SYSTEM!!!")
