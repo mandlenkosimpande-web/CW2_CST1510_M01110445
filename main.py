@@ -165,15 +165,51 @@ def update_user(conn, old_name, new_name):
     conn.commit()
     conn.close
 
+def delete_user(conn, user_name):
+    cur = conn.cursor()
+    sql = 'DELETE FROM users WHERE username = ?'
+    param = (user_name,)
+    cur.execute(sql, param)
+    conn.commit()
+    
+
+
+def migrate_cyber_incidents(conn):
+    data = pd.read_csv('DATA/cyber_incidents.csv')
+    data.to_sql('cyber_incidents.csv', conn)
+
+def migrate_datasets_metadata(conn):    
+    data = pd.read_csv('DATA/datasets_metadata.csv')
+    data.to_sql('datasets_metadata', conn)
+  
+
+def migrate_it_tickets(conn):    
+    data = pd.read_csv('DATA/it_tickets.csv')
+    data.to_sql('it_tickets', conn)     
+
+
+
+def get_all_cyber_incidents(conn):
+    sql = 'SELECT * FROM cyber_incidents'
+    data = pd.read_sql(sql, conn)
+    conn.close()
+    return(data)
+
+
+def get_all_datasets_metadata(conn):
+    sql = 'SELECT * FROM datasets_metadata'
+    data = pd.read_sql(sql, conn)
+    conn.close()
+    return(data)
+
+def get_all_it_tickets(conn):
+    sql = 'SELECT * FROM it_tickets'
+    data = pd.read_sql(sql, conn)
+    conn.close()
+    return(data)
+
 conn = sqlite3.connect("DATA/project_data.db")
-cur = conn.cursor()
-sql = 'DELETE FROM users WHERE username = ?'
-param = ('mandlampande',)
-cur.execute(sql, param)
-conn.commit()
-conn.close
-
-
+print(get_all_it_tickets(conn))
 
 
 
@@ -193,4 +229,5 @@ while True:
     else:
         print("Invalid choice. Please try again.")
         
+
 
