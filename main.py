@@ -4,6 +4,9 @@ import csv
 import os 
 import sqlite3, pandas as pd
 
+from app_model.db import conn
+from app_model.users import add_user, get_user
+
 TXT_FILE = 'DATA/users.txt'
 
 #Create TXT file if it doesn't exist
@@ -27,7 +30,7 @@ def is_valid_hash(psw, hash):
     return is_valid
 
 #user registration
-def register_user():
+def register_user(conn):
     username = input("Enter username: ").strip() #this first line will remove any leading or trailing whitespace from the username input
     role = input("Enter role (admin/user): ").strip().lower()
 
@@ -49,35 +52,22 @@ def register_user():
             
     password = input ("Enter password: ")
     hashed = generates_hash(password)
+    add_user(conn, username, hashed)
 
-    with open(TXT_FILE, 'a', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow([username, hashed, role])
 
-    print(f"User '{username}' registered successfully.")
+  
 
 
 #user login 
-def login_user():
+def login_user(conn):
     username = input("Enter username: ").strip()
-   
-   #check if the username exists
-    user_found = False
-    stored_hash = None
-
-
-    with open (TXT_FILE, 'r') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if row['username'] == username:
-                user_found = True
-                stored_hash = row['password']
-                break 
-
-    if not user_found:
+    user = get_user(conn, username)
+    if not user:
         print("Username not found. Please register first.")
         return
     
+    id, username, stored_hash, role = user
+    print(f"WELCOME {username} !!")
     #Allow the user to enter password a max amount of 3 times
     max_attempts = 3
 
@@ -101,133 +91,44 @@ def login_user():
                 print("Maximum login attempts reached. Please try again later.")
                 return
             
+def main():            
+    while True:
+        print("\n WELCOME TO THE SYSTEM!!!")
+        print("1. Register")
+        print("2. Login")
+        print("3. Exit")
+        choice = input("Enter your choice: ")
+        if choice == '1':
+            register_user(conn)
+        elif choice == '2':
+            login_user(conn)
+        elif choice == '3':
+            print("Exiting the system. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == '__main__':
+    main()
 
 
-# create database insert, delete, update  
-def create_users_table(conn):
-    cur = conn.cursor()
-    sql =  '''CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password_hash TEXT NOT NULL,
-            role TEXT DEFAULT 'user'
-        );'''    
-    cur.execute(sql)
-    conn.commit()
 
 
-def add_user(conn, username, password_hash, role = 'user'):
-    cur = conn.cursor()
-    sql = '''INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)'''
-    param = (username, password_hash, role)
-    cur.execute(sql, param)
-    conn.commit()   
-
-def migrate_users_to_db(conn):
-    with open(TXT_FILE, 'r') as f:
-        users = f.readlines()
-#the following lines of code allow me to skip the header row so it is not passed as an actuall user
-    for user in users[1:]:  
-        parts = user.strip().split(',')
-        if len(parts) < 3:
-            continue  # skipping blank or malformed lines 
-        username, password_hash, role = parts[0], parts[1], parts[2]
-        add_user(conn, username, password_hash, role)
-
-
-def get_all_users(conn):
-    cur = conn.cursor()
-    create_users_table(conn)
-    migrate_users_to_db(conn)
-    cur = conn.cursor()
-    sql = '''SELECT * FROM users'''
-    cur.execute(sql)
-    users = cur.fetchall()
-    conn.close()
-    return(users)   
-
-#read just one user based of name 
-
-def get_user(conn, name ):
-    cur = conn.cursor()
-    sql = '''SELECT * FROM users WHERE username = ?'''
-    param = (name,)
-    cur.execute(sql, param)
-    user = cur.fetchone()
-    conn.close()
-    return(user)
-
-def update_user(conn, old_name, new_name):
-    cur = conn.cursor()
-    sql = 'UPDATE users SET username = ? WHERE username = ?'
-    param = (new_name,old_name)
-    cur.execute(sql, param)
-    conn.commit()
-    conn.close
-
-def delete_user(conn, user_name):
-    cur = conn.cursor()
-    sql = 'DELETE FROM users WHERE username = ?'
-    param = (user_name,)
-    cur.execute(sql, param)
-    conn.commit()
     
 
 
-def migrate_cyber_incidents(conn):
-    data = pd.read_csv('DATA/cyber_incidents.csv')
-    data.to_sql('cyber_incidents.csv', conn)
 
-def migrate_datasets_metadata(conn):    
-    data = pd.read_csv('DATA/datasets_metadata.csv')
-    data.to_sql('datasets_metadata', conn)
+
+
   
 
-def migrate_it_tickets(conn):    
-    data = pd.read_csv('DATA/it_tickets.csv')
-    data.to_sql('it_tickets', conn)     
 
 
 
-def get_all_cyber_incidents(conn):
-    sql = 'SELECT * FROM cyber_incidents'
-    data = pd.read_sql(sql, conn)
-    conn.close()
-    return(data)
-
-
-def get_all_datasets_metadata(conn):
-    sql = 'SELECT * FROM datasets_metadata'
-    data = pd.read_sql(sql, conn)
-    conn.close()
-    return(data)
-
-def get_all_it_tickets(conn):
-    sql = 'SELECT * FROM it_tickets'
-    data = pd.read_sql(sql, conn)
-    conn.close()
-    return(data)
-
-conn = sqlite3.connect("DATA/project_data.db")
-print(get_all_it_tickets(conn))
 
 
 
-while True:
-    print("\n WELCOME TO THE SYSTEM!!!")
-    print("1. Register")
-    print("2. Login")
-    print("3. Exit")
-    choice = input("Enter your choice: ")
-    if choice == '1':
-        register_user()
-    elif choice == '2':
-        login_user()
-    elif choice == '3':
-        print("Exiting the system. Goodbye!")
-        break
-    else:
-        print("Invalid choice. Please try again.")
+
         
 
 
