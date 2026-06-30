@@ -46,7 +46,7 @@ def register_user(conn):
     with open(TXT_FILE, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row ['username'] == username:
+            if row ['username'] == username:#goes through every row under username and checks if there is a similar username.
                 print("Username already exists. Please choose a different username.")
                 return
             
